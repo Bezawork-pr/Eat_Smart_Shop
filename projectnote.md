@@ -1,0 +1,18 @@
+- installed long time support Node js from the Node js main page
+- npm init -y to derive a package.json file
+- npm i express to install express
+- npm -i --save-dev nodemon to install as a dev dependency to reload without restarting
+- Import express to app file
+- Initalize express
+- Define port
+- Use get to define and connect with routes
+- Use views folder to render HTML like page using ejs for now
+- Use set to use ejs files from views
+- Use routes folder to handle routes
+- Use response. render to render index file
+- Create three routes for now admin, products and users
+- User route handles '/users', '/users/profile', '/users/cart'
+- Use router to connect with express in app.js
+- Export router
+- In app.js import specific router 
+- Use aapp.use to use imported router
