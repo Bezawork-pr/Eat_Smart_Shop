@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "firstName": "Emanuel",
+    "lastName": "Abraham",
+    "userName": "Emanuel",
+    "delivery": "Ethiopia",
+    "orders": {
+      "products": [
+        {
+          "productId": "1",
+          "productName": "BearMug",
+          "receiptNumber": 1
+        }
+      ]
+    },
+    "basket": {
+      "products": [
+        {
+          "productId": "2",
+          "productName": "T-shirt"
+        }
+      ]
+    }
+  }
+]

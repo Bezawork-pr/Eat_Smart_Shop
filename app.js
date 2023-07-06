@@ -1,14 +1,21 @@
 const express = require("express");
+const bodyParser = require("body-parser");
+
+const homePage = require("./routes/home");
+const signInRouter = require("./routes/signIn");
+const PATH = require("path");
 const app = express();
-const port = 3000;
-const userRouter = require("./routes/users");
+
+const PORT = 3000;
 
 app.use(express.static("public"));
+app.set("views", "public");
+app.engine("html", require("ejs").renderFile);
+app.set("view engine", "html");
+app.use(bodyParser.json());
 
-app.set("view engine", "ejs");
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use("/", homePage);
+app.use("/signIn", signInRouter);
 
-app.get("/", (req, res) => {
-  res.render("index");
-});
-app.use("/users", userRouter);
-app.listen(port);
+app.listen(PORT);
