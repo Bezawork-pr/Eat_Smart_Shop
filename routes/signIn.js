@@ -1,3 +1,5 @@
+const uuid = require("uuid");
+
 const express = require("express");
 
 const router = express.Router();
@@ -32,19 +34,20 @@ const array = [
 ];
 
 router.get("/", (req, res) => {
-  console.log(array);
-  //res.render(PATH.join(__dirname + "/../public/login"));
   res.send(array);
 });
 
 router.post("/", (req, res) => {
+  const id = uuid.v4();
   let userDetail = req.body;
-  console.log(userDetail[0].firstName);
-  array.push(userDetail);
-  //res.render(PATH.join(__dirname + "/../public/login"));
-  res.send(`User added ${userDetail[0].firstName} `);
-  //console.log(req.body);
-  //res.send("Got it");
+  const userDetailwithUniqueID = { id: id, ...userDetail };
+  array.push(userDetailwithUniqueID);
+  res.send(`User added ${userDetail}`);
 });
 
+router.get("/:id", (req, res) => {
+  const userID = req.params.id;
+  const findUser = array.find((userID) => userID === id);
+  res.send("got it");
+});
 module.exports = router;
