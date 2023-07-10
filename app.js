@@ -16,6 +16,6 @@ app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/", homePage);
-app.use("/signIn", signInRouter);
+app.use("/user", signInRouter);
 
 app.listen(PORT);

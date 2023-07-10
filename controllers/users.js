@@ -1,6 +1,31 @@
 const uuid = require("uuid");
 const express = require("express");
-
+let array = [
+  {
+    id: uuid.v4(),
+    firstName: "Emanuel",
+    lastName: "Abraham",
+    userName: "Emanuel",
+    delivery: "Ethiopia",
+    orders: {
+      products: [
+        {
+          productId: uuid.v4(),
+          productName: "BearMug",
+          receiptNumber: 1,
+        },
+      ],
+    },
+    basket: {
+      products: [
+        {
+          productId: 2,
+          productName: "T-shirt",
+        },
+      ],
+    },
+  },
+];
 const getUsers = (req, res) => {
   res.send(array);
 };
@@ -23,10 +48,10 @@ const getUser = (req, res) => {
 const deleteUser = (req, res) => {
   const userID = req.params.id;
   array = array.filter((item) => item.id !== userID);
-  res.send(`Deleted`);
+  res.send(`User Deleted`);
 };
 
-const patchUser = (req, res) => {
+const updateUser = (req, res) => {
   const userID = req.params.id;
   const findUser = array.find((element) => element.id === userID);
 
@@ -44,5 +69,13 @@ const patchUser = (req, res) => {
     const { productName } = basket.products[0];
     findUser.basket.products[0].productName = productName;
   }
-  res.send("Got it");
+  res.send("Updated");
+};
+
+module.exports = {
+  getUsers,
+  createUser,
+  getUser,
+  deleteUser,
+  updateUser,
 };
