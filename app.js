@@ -8,6 +8,7 @@ const app = express();
 
 const PORT = 3000;
 
+
 app.use(express.static("public"));
 app.set("views", "public");
 app.engine("html", require("ejs").renderFile);
