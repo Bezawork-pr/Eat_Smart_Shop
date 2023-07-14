@@ -1,4 +1,5 @@
 const mysql = require("mysql2");
+
 const connection = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -8,6 +9,7 @@ const connection = mysql.createConnection({
 
 connection.connect((err) => {
   if (err) {
+    setTimeout(connection, "1000");
     console.log(err);
     return;
   }

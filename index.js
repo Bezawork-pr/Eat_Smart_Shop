@@ -31,6 +31,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
   const query = "SELECT * FROM Product";
+
   connection.query(query, (err, result) => {
     if (err) throw err;
     res.render("pages/index", { result: result });
