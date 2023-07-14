@@ -76,3 +76,10 @@ Values(1, "John", "Doe", '["Iphone", "Samsung"]',  1);
 
 INSERT INTO USER(ProductDict)
 VALUES('["Iphone", "Samsung"]')
+
+CREATE TABLE CurrentUser (
+  FirstName varchar(255),
+  LastName varchar(255)
+);
+INSERT INTO CurrentUser (FirstName, LastName)
+VALUES("John", "Doe");

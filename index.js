@@ -1,46 +1,38 @@
 const express = require("express");
 const ejs = require("ejs");
 const bodyParser = require("body-parser");
+const connection = require("./sqlconnection");
+try {
+  connection.query("SELECT * FROM CurrentUser", (err, res) => {
+    console.log(res);
+  });
+} catch (err) {}
+var currentUserFirstName, currentUserLastName;
 
-const mysql = require("mysql2");
-const connection = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "Eat_Smart_Shop",
-});
-
-connection.connect((err) => {
-  if (err) {
-    console.log(err);
-    return;
-  }
-  console.log("Database Connected");
-});
 try {
   const order =
     "INSERT INTO Orders (OrderId, HowManyOrdered, ProductId, OrderReceipt) VALUES(1, 1, 1, 1);";
   connection.query(order, (err, result) => {
     console.log("Order added");
   });
+
+  console.log("Order added");
 } catch (err) {
   console.log(err);
 }
+
+const mysql = require("mysql2");
 const app = express();
 const PORT = 5000;
-let currentUserFirstName = "Unknown";
-let currentUserLastName = "UnKnown";
+
 app.use(express.static("public"));
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(function (req, res, next) {
-//   console.log("Connected");
-//   res.locals.connection = createConnection;
-//   console.log("Disconnected");
-//   next();
-// });
+
 app.get("/", (req, res) => {
-  connection.query("SELECT * FROM Product", (err, result) => {
+  const query = "SELECT * FROM Product";
+  connection.query(query, (err, result) => {
+    if (err) throw err;
     res.render("pages/index", { result: result });
   });
 });
@@ -48,13 +40,16 @@ app.get("/", (req, res) => {
 app.get("/registration", (req, res) => {
   res.render("pages/registration");
 });
+
 app.post("/registration", (req, res) => {
   let firstName = req.body.firstname;
   let lastName = req.body.lastname;
-  const PersonId = 1;
+  let length = 1;
+  connection.query("SELECT * FROM User", (err, res) => (length = res.length));
+  const PersonId = length + 1;
   connection.query(
-    "INSERT INTO User (PersonId, FirstName, LastName, OrderId) VALUES (1, ?, ?, 1) ",
-    [firstName, lastName],
+    "INSERT INTO User (PersonId, FirstName, LastName, OrderId) VALUES (?, ?, ?, 1) ",
+    [PersonId, firstName, lastName],
     (err, result) => {
       if (err) throw err;
       console.log("Registered");
@@ -62,6 +57,7 @@ app.post("/registration", (req, res) => {
   );
   res.render("pages/registration");
 });
+
 app.get("/login", (req, res) => {
   res.render("pages/login");
 });
@@ -74,6 +70,14 @@ app.post("/login", (req, res) => {
   connection.query("SELECT * FROM Product", (err, res) => {
     result = res;
   });
+  connection.query(
+    "INSERT INTO CurrentUser (FirstName, LastName) VALUES (?, ?)",
+    [firstName, lastName],
+    (err, result) => {
+      if (err) throw err;
+      console.log("Current User added to DB");
+    }
+  );
   connection.query("SELECT * FROM User", (err, Userresult) => {
     for (let i in Userresult) {
       if (
@@ -89,40 +93,74 @@ app.post("/login", (req, res) => {
     }
   });
 });
-app.get("/buy", (req, res) => {
+
+app.get("/buy", (req, res, next) => {
   let result = 1;
   connection.query("SELECT * FROM Product", (err, res) => {
     result = res;
   });
   connection.query("SELECT * FROM User", (err, Userresult) => {
-    for (let i in Userresult) {
-      if (
-        Userresult[i].FirstName === currentUserFirstName &&
-        Userresult[i].LastName === currentUserLastName
-      ) {
+    var firstName = "UnKnown";
+    var lastName = "UnKnown";
+    connection.query("SELECT * FROM CurrentUser", (err, CurrentUser) => {
+      try {
+        firstName = CurrentUser[0].FirstName;
+        lastName = CurrentUser[0].LastName;
+        console.log(firstName, lastName);
         res.render("pages/buy", {
           result: result,
-          firstName: currentUserFirstName,
-          lastName: currentUserLastName,
+          firstName: firstName,
+          lastName: lastName,
         });
-      }
-    }
-    res.render("pages/buy", {
-      result: result,
-      firstName: currentUserFirstName,
-      lastName: currentUserLastName,
+      } catch (err) {}
     });
   });
 });
 app.post("/buy", (req, res) => {
-  let products = 1
-  connection.query("SELECT * FROM Product", (err, res) => {
-    result = res;
+  let result = [];
+  let orders = 1;
+  let orderId = 1;
+  let products = 1;
+  let users = 1;
+  var firstName = "UnKnown";
+  var lastName = "UnKnown";
+  connection.query("SELECT * FROM User", (err, resultFromUserTable) => {
+    if (err) throw err;
+    users = resultFromUserTable;
   });
-  for (let i in result) {
-    
-  }
-  const updateProductQuery = "UPDATE Orders set"
+  connection.query("SELECT * FROM Product", (err, resultFromProductTable) => {
+    if (err) throw err;
+    products = resultFromProductTable;
+  });
+  connection.query("SELECT * FROM Orders", (err, resultFromOrdersTable) => {
+    if (err) throw err;
+    orders = resultFromOrdersTable;
+  });
+  connection.query("SELECT * FROM CurrentUser", (err, CurrentUser) => {
+    try {
+      firstName = CurrentUser[0].FirstName;
+      lastName = CurrentUser[0].LastName;
+      console.log(firstName, lastName);
+    } catch (err) {}
+    for (let i in users) {
+      for (let m in orders) {
+        console.log();
+        if (orders[m].OrderId === users[i].OrderId) {
+          for (let j in products) {
+            if (orders[m].ProductId === products[j].ProductId) {
+              result.push(products[j]);
+              console.log(result);
+            }
+          }
+        }
+      }
+    }
+    res.render("pages/order", {
+      result: result,
+      firstName: firstName,
+      lastName: lastName,
+    });
+  });
 });
 
 app.listen(PORT);
