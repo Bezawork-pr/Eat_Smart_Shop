@@ -33,13 +33,9 @@
             </form>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="http://localhost:5000/login"> Login </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="http://localhost:5000/logout"> Logout </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="http://localhost:5000/buy"> Order </a>
+            <a class="nav-link" href="http://localhost:5000/login">
+              <%= firstName %>
+            </a>
           </li>
         </div>
       </nav>
@@ -55,15 +51,14 @@
         />
         <div class="card-body">
           <h5 class="card-title"><%= element.ProductName %></h5>
-          <p class="card-text"><%= element.ProductDescription %></p>
+          <p class="card-text"></p>
         </div>
         <ul class="list-group list-group-flush">
-          <li class="list-group-item">Price: <%= element.Price %></li>
           <li class="list-group-item">
-            Initial Quantity: <%= element.InitialQuantity %>
+            Ordered amount: <%= element.HowManyOrdered %>
           </li>
           <li class="list-group-item">
-            Product Left: <%= element.HowManyLeft %>
+            Receipt Number: <%= element.OrderReceipt %>
           </li>
         </ul>
       </div>

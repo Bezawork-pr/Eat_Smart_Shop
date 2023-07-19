@@ -2,6 +2,7 @@ const express = require("express");
 const ejs = require("ejs");
 const bodyParser = require("body-parser");
 const connection = require("./sqlconnection");
+
 try {
   connection.query("SELECT * FROM CurrentUser", (err, res) => {
     console.log(res);
@@ -9,19 +10,18 @@ try {
 } catch (err) {}
 var currentUserFirstName, currentUserLastName;
 
-try {
-  const order =
-    "INSERT INTO Orders (OrderId, HowManyOrdered, ProductId, OrderReceipt) VALUES(1, 1, 1, 1);";
-  connection.query(order, (err, result) => {
-    console.log("Order added");
-  });
+// try {
+//   const order =
+//     "INSERT INTO Orders (OrderId, HowManyOrdered, ProductId, OrderReceipt) VALUES(1, 1, 1, 1);";
+//   connection.query(order, (err, result) => {
+//     console.log("Order added");
+//   });
 
-  console.log("Order added");
-} catch (err) {
-  console.log(err);
-}
+//   console.log("Order added");
+// } catch (err) {
+//   console.log(err);
+// }
 
-const mysql = require("mysql2");
 const app = express();
 const PORT = 5000;
 
@@ -39,17 +39,23 @@ app.get("/", (req, res) => {
 });
 
 app.get("/registration", (req, res) => {
-  res.render("pages/registration");
+  const query = "SELECT * FROM Orders";
+  connection.query(query, (err, Orders) => {
+    if (err) throw err;
+    res.render("pages/registration", { Orders: Orders });
+  });
 });
 
 app.post("/registration", (req, res) => {
   let firstName = req.body.firstname;
   let lastName = req.body.lastname;
-  let length = 1;
-  connection.query("SELECT * FROM User", (err, res) => (length = res.length));
-  const PersonId = length + 1;
+  let PersonId = req.body.PersonId;
+  // Update Later
+  //connection.query("SELECT COUNT(FirstName) FROM User", (err, res) => {
+  //});
+
   connection.query(
-    "INSERT INTO User (PersonId, FirstName, LastName, OrderId) VALUES (?, ?, ?, 1) ",
+    "INSERT INTO User (PersonId, FirstName, LastName) VALUES (?, ?, ?) ",
     [PersonId, firstName, lastName],
     (err, result) => {
       if (err) throw err;
@@ -71,6 +77,7 @@ app.post("/login", (req, res) => {
   connection.query("SELECT * FROM Product", (err, res) => {
     result = res;
   });
+  connection.query("DELETE FROM CurrentUser");
   connection.query(
     "INSERT INTO CurrentUser (FirstName, LastName) VALUES (?, ?)",
     [firstName, lastName],
@@ -117,51 +124,175 @@ app.get("/buy", (req, res, next) => {
     });
   });
 });
+
 app.post("/buy", (req, res) => {
-  let result = [];
-  let orders = 1;
-  let orderId = 1;
-  let products = 1;
-  let users = 1;
-  var firstName = "UnKnown";
-  var lastName = "UnKnown";
+  // let myResult;
+  // function queryCurrentUser() {
+  //   connection.query("SELECT * FROM CurrentUser", (err, result) => {
+  //     myResult = result[0].FirstName;
+  //   });
+  //   return myResult;
+  // }
+  // global.result = [];
+  // global.orders = 1;
+  // let orderId = 1;
+  // let products = 1;
+  // let users = 1;
+
+  // var lastName = "UnKnown";
+  //connection.query("SELECT * FROM CurrentUser", (err, result) => {
+  // global.firstName = result[0].FirstName;
+  //});
+  // let firstName = queryCurrentUser();
+  // console.log(firstName);
+  // console.log("-------");
+  // res.send(firstName);
+  // connection.query("SELECT * FROM User", (err, resultFromUserTable) => {
+  //   if (err) throw err;
+  //   users = resultFromUserTable;
+  // });
+
+  // connection.query("SELECT * FROM Product", (err, resultFromProductTable) => {
+  //   if (err) throw err;
+  //   products = resultFromProductTable;
+  // });
+  // connection.query("SELECT * FROM Orders", (err, resultFromOrdersTable) => {
+  //   if (err) throw err;
+  //   orders = resultFromOrdersTable;
+  // });
+  // connection.query("SELECT * FROM CurrentUser", (err, CurrentUser) => {
+  //   try {
+  //     firstName = CurrentUser[0].FirstName;
+  //     lastName = CurrentUser[0].LastName;
+  //     console.log(firstName, lastName);
+  //   } catch (err) {}
+  //   for (let i in users) {
+  //     for (let m in orders) {
+  //       console.log();
+  //       if (orders[m].OrderId === users[i].OrderId) {
+  //         for (let j in products) {
+  //           if (orders[m].ProductId === products[j].ProductId) {
+  //             result.push(products[j]);
+  //             console.log(result);
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  //   res.render("pages/order", {
+  //     result: result,
+  //     firstName: firstName,
+  //     lastName: lastName,
+  //   });
+  // });
+  // let result = [];
+  // let orders = 1;
+  // let orderId = 1;
+  // let products = 1;
+  // let users = 1;
+  // var firstName = "UnKnown";
+  // var lastName = "UnKnown";
+  // connection.query("SELECT * FROM User", (err, resultFromUserTable) => {
+  //   if (err) throw err;
+  //   userForPostBuy = resultFromUserTable;
+  // });
+  const ProductName = req.body.productname;
+  const numberOfPurchase = Number.parseInt(req.body.numberofpurchase);
+  const OrderId = Number.parseInt(req.body.orderId);
+  const orderReceipt = Number.parseInt(req.body.orderReceipt);
+
   connection.query("SELECT * FROM User", (err, resultFromUserTable) => {
     if (err) throw err;
-    users = resultFromUserTable;
+    userForPostBuy = resultFromUserTable;
   });
-  connection.query("SELECT * FROM Product", (err, resultFromProductTable) => {
-    if (err) throw err;
-    products = resultFromProductTable;
-  });
-  connection.query("SELECT * FROM Orders", (err, resultFromOrdersTable) => {
-    if (err) throw err;
-    orders = resultFromOrdersTable;
-  });
-  connection.query("SELECT * FROM CurrentUser", (err, CurrentUser) => {
-    try {
-      firstName = CurrentUser[0].FirstName;
-      lastName = CurrentUser[0].LastName;
-      console.log(firstName, lastName);
-    } catch (err) {}
-    for (let i in users) {
-      for (let m in orders) {
-        console.log();
-        if (orders[m].OrderId === users[i].OrderId) {
-          for (let j in products) {
-            if (orders[m].ProductId === products[j].ProductId) {
-              result.push(products[j]);
-              console.log(result);
-            }
-          }
+  connection.query(
+    "SELECT * FROM Product",
+    (errorForProduct, resultFromProductTable) => {
+      if (errorForProduct) throw errorForProduct;
+      for (let p in resultFromProductTable) {
+        if (resultFromProductTable[p].ProductName === ProductName) {
+          var ProductId = resultFromProductTable[p].ProductId;
         }
       }
+      connection.query(
+        "SELECT * FROM CurrentUser",
+        (err, resultFromCurrentUserTable) => {
+          if (err) throw err;
+          firstName = resultFromCurrentUserTable[0].FirstName;
+          connection.query("SELECT * FROM User", (err, resultFromUserTable) => {
+            if (err) throw err;
+            for (let i in resultFromUserTable) {
+              if (resultFromUserTable[i].FirstName === firstName) {
+                const PersonId = resultFromUserTable[i].PersonId;
+                connection.query(
+                  "INSERT INTO Orders (OrderId, ProductId, PersonId, HowManyOrdered, ProductName, OrderReceipt) VALUES(?, ?, ?, ?, ?, ?)",
+                  [
+                    OrderId,
+                    ProductId,
+                    PersonId,
+                    numberOfPurchase,
+                    ProductName,
+                    orderReceipt,
+                  ],
+                  (errorfromInsert, resultFromInsert) => {
+                    if (errorfromInsert) throw errorfromInsert;
+                    connection.query(
+                      "SELECT * FROM Orders",
+                      (errorFromretrieve, resultFromRetrieve) => {
+                        let result = [];
+                        for (let j in resultFromRetrieve) {
+                          if (resultFromRetrieve[j].PersonId === PersonId) {
+                            result.push(resultFromRetrieve[j]);
+                          }
+                        }
+                        for (let k in result) {
+                          console.log(result[k].OrderId);
+                        }
+                        res.render("pages/order", {
+                          result: result,
+                          firstName: firstName,
+                        });
+                      }
+                    );
+                  }
+                );
+              }
+            }
+          });
+        }
+      );
     }
-    res.render("pages/order", {
-      result: result,
-      firstName: firstName,
-      lastName: lastName,
-    });
-  });
+  );
+  // console.log(products);
+  // connection.query("SELECT * FROM Orders", (err, resultFromOrdersTable) => {
+  //   if (err) throw err;
+  //   orders = resultFromOrdersTable;
+  // });
+  // connection.query("SELECT * FROM CurrentUser", (err, CurrentUser) => {
+  //   try {
+  //     firstName = CurrentUser[0].FirstName;
+  //     lastName = CurrentUser[0].LastName;
+  //     console.log(firstName, lastName);
+  //   } catch (err) {}
+  //   for (let i in users) {
+  //     for (let m in orders) {
+  //       console.log();
+  //       if (orders[m].OrderId === users[i].OrderId) {
+  //         for (let j in products) {
+  //           if (orders[m].ProductId === products[j].ProductId) {
+  //             result.push(products[j]);
+  //             console.log(result);
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  //   res.render("pages/order", {
+  //     result: result,
+  //     firstName: firstName,
+  //     lastName: lastName,
+  //   });
+  // });
 });
 
 app.listen(PORT);

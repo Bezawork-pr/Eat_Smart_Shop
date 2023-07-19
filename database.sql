@@ -4,11 +4,8 @@ CREATE TABLE User (
   PersonId int NOT NULL ,
   FirstName varchar(255) NOT NULL,
   LastName varchar(255) NOT NULL,
-  ProductDict JSON,
-  OrderId int NOT NULL,
   PRIMARY KEY (PersonId),
-  UNIQUE (PersonId),
-  FOREIGN KEY (OrderId) REFERENCES Orders(OrderId)
+  UNIQUE (PersonId)
 );
 -- CREATE TABLE TotalPurchase (
 --    TotalPurchasedID int NOT NULL,
@@ -32,10 +29,14 @@ CREATE TABLE Product (
 CREATE TABLE Orders (
   OrderId int NOT NULL,
   ProductId int NOT NULL,
+  PersonId int NOT NULL,
   HowManyOrdered int NOT NULL,
+  ProductName varchar(255) NOT NULL,
+
   OrderReceipt int NOT NULL,
   PRIMARY KEY (OrderId),
-  FOREIGN KEY (ProductId) REFERENCES Product(ProductId)
+  FOREIGN KEY (ProductId) REFERENCES Product(ProductId),
+  FOREIGN KEY (PersonId) REFERENCES User(PersonId)
 );
 
 
@@ -71,8 +72,8 @@ VALUES(2, 5, 2, 2);
 
 -- INSERT INTO TotalPurchase(TotalPurchasedID, TotalProductsPurchased, ProductId, OrderId)
 -- VALUES(1, 6, )
-INSERT INTO USER (PersonId, FirstName, LastName, ProductDict, OrderId)
-Values(1, "John", "Doe", '["Iphone", "Samsung"]',  1);
+INSERT INTO USER (PersonId, FirstName, LastName)
+Values(1, "John", "Doe");
 
 INSERT INTO USER(ProductDict)
 VALUES('["Iphone", "Samsung"]')
